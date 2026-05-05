@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { randomUUID } from "crypto";
 import { generateDielineSchema } from "@/lib/validation/schemas";
-import { generateDielineImage } from "@/lib/server/geminiDieline";
+import { generateDielineImage } from "@/lib/server/claudeDieline";
 import { parseOptionalBase64Image } from "@/lib/server/base64";
 import { defaultDimensionsMm } from "@/lib/constants/boxTypes";
 
@@ -59,6 +59,7 @@ export async function POST(req: Request) {
       success: true,
       dielinePath,
       dielineBase64: out.pngBuffer.toString("base64"),
+      cleanTextureBase64: (out.cleanTextureBuffer ?? out.pngBuffer).toString("base64"),
       designNotes: out.designNotes,
       colorPalette: out.colorPalette,
       generatedAt: new Date().toISOString(),
@@ -74,8 +75,8 @@ export async function POST(req: Request) {
     return NextResponse.json(
       {
         success: false,
-        error: unauthorized ? "GEMINI_API_ERROR" : "GENERATION_FAILED",
-        message: unauthorized ? "Invalid or missing Gemini API key" : message,
+        error: unauthorized ? "AI_API_ERROR" : "GENERATION_FAILED",
+        message: unauthorized ? "Invalid or missing AI API key" : message,
         statusCode: unauthorized ? 401 : 500,
       },
       { status: unauthorized ? 401 : 500 },

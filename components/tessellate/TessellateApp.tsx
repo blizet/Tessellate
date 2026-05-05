@@ -12,6 +12,7 @@ import {
 type GenResp = {
   success: boolean;
   dielineBase64?: string;
+  cleanTextureBase64?: string;
   designNotes?: string;
   colorPalette?: string[];
   processingTime?: number;
@@ -73,6 +74,7 @@ export function TessellateApp() {
   const [useCustomDims, setUseCustomDims] = useState(false);
 
   const [dielineBase64, setDielineBase64] = useState<string | null>(null);
+  const [cleanTextureBase64, setCleanTextureBase64] = useState<string | null>(null);
   const [designNotes, setDesignNotes] = useState<string | null>(null);
   const [gltfBase64, setGltfBase64] = useState<string | null>(null);
   const [previewBase64, setPreviewBase64] = useState<string | null>(null);
@@ -114,6 +116,7 @@ export function TessellateApp() {
       });
       if (!out.success || !out.dielineBase64) throw new Error(out.message ?? "Dieline generation failed");
       setDielineBase64(out.dielineBase64);
+      setCleanTextureBase64(out.cleanTextureBase64 ?? out.dielineBase64);
       setDesignNotes(out.designNotes ?? null);
       setGltfBase64(null);
       setPreviewBase64(null);
@@ -131,7 +134,7 @@ export function TessellateApp() {
     setBusy("convert");
     try {
       const out = await postJson<ConvResp>("/api/convert-to-3d", {
-        dielineBase64,
+        dielineBase64: cleanTextureBase64 ?? dielineBase64,
         boxType,
         ...(bgBase64 ? { backgroundBase64: bgBase64 } : {}),
         ...(useCustomDims ? { customDimensions: dims } : {}),
