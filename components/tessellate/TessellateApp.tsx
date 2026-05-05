@@ -58,7 +58,8 @@ function downloadBase64(base64: string, filename: string, mime: string): void {
 // ─── Shared input class ───────────────────────────────────────────────────────
 const inputCls =
   "w-full rounded-md border border-black bg-white px-3 py-2 text-black outline-none " +
-  "ring-yellow-400/40 placeholder:text-black/55 focus:border-black focus:ring-2 transition";
+  "ring-yellow-400/40 placeholder:text-black/55 focus:border-black focus:ring-2 transition " +
+  "hover:border-black/70 hover:shadow-sm";
 
 export function TessellateApp() {
   const [businessName, setBusinessName] = useState("");
@@ -260,8 +261,11 @@ export function TessellateApp() {
                 Design input
               </h2>
 
-              <label className="block space-y-1.5">
-                <span className="text-sm font-medium" style={{ color: "var(--ts-text)" }}>Business name</span>
+              <label className="block space-y-1.5 group">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-medium" style={{ color: "var(--ts-text)" }}>Business name</span>
+                  <span className="text-xs opacity-0 group-hover:opacity-100 transition" style={{ color: "var(--ts-text-muted)" }} title="Your brand name will appear on the packaging">ℹ️</span>
+                </div>
                 <input
                   className={inputCls}
                   value={businessName}
@@ -270,8 +274,11 @@ export function TessellateApp() {
                 />
               </label>
 
-              <label className="block space-y-1.5">
-                <span className="text-sm font-medium" style={{ color: "var(--ts-text)" }}>Tagline</span>
+              <label className="block space-y-1.5 group">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-medium" style={{ color: "var(--ts-text)" }}>Tagline</span>
+                  <span className="text-xs opacity-0 group-hover:opacity-100 transition" style={{ color: "var(--ts-text-muted)" }} title="A memorable phrase or slogan for your brand">ℹ️</span>
+                </div>
                 <input
                   className={inputCls}
                   value={tagline}
@@ -280,8 +287,11 @@ export function TessellateApp() {
                 />
               </label>
 
-              <label className="block space-y-1.5">
-                <span className="text-sm font-medium" style={{ color: "var(--ts-text)" }}>Creative direction</span>
+              <label className="block space-y-1.5 group">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-medium" style={{ color: "var(--ts-text)" }}>Creative direction</span>
+                  <span className="text-xs opacity-0 group-hover:opacity-100 transition" style={{ color: "var(--ts-text-muted)" }} title="Describe the visual style, colors, and overall aesthetic">ℹ️</span>
+                </div>
                 <textarea
                   rows={4}
                   className={inputCls + " resize-y"}
@@ -291,8 +301,11 @@ export function TessellateApp() {
                 />
               </label>
 
-              <label className="block space-y-1.5">
-                <span className="text-sm font-medium" style={{ color: "var(--ts-text)" }}>Box template</span>
+              <label className="block space-y-1.5 group">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-medium" style={{ color: "var(--ts-text)" }}>Box template</span>
+                  <span className="text-xs opacity-0 group-hover:opacity-100 transition" style={{ color: "var(--ts-text-muted)" }} title="Choose the packaging shape that matches your product">ℹ️</span>
+                </div>
                 <select
                   className={inputCls}
                   value={boxType}
@@ -308,8 +321,12 @@ export function TessellateApp() {
                 </select>
               </label>
 
-              <label className="block space-y-1.5">
-                <span className="text-sm font-medium" style={{ color: "var(--ts-text)" }}>Style hint (optional)</span>
+              <label className="block space-y-1.5 group">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-medium" style={{ color: "var(--ts-text)" }}>Style hint</span>
+                  <span className="text-xs font-normal opacity-60">optional</span>
+                  <span className="text-xs opacity-0 group-hover:opacity-100 transition" style={{ color: "var(--ts-text-muted)" }} title="Suggest an aesthetic direction: minimalist, luxury, playful, elegant, etc.">ℹ️</span>
+                </div>
                 <input
                   className={inputCls}
                   value={style}
@@ -318,27 +335,37 @@ export function TessellateApp() {
                 />
               </label>
 
-              <div className="space-y-1.5">
-                <span className="text-sm font-medium" style={{ color: "var(--ts-text)" }}>Logo (optional)</span>
+              <div className="space-y-1.5 group">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-medium" style={{ color: "var(--ts-text)" }}>Logo</span>
+                  <span className="text-xs font-normal opacity-60">optional</span>
+                  <span className="text-xs opacity-0 group-hover:opacity-100 transition" style={{ color: "var(--ts-text-muted)" }} title="Upload your brand logo to include in the design">ℹ️</span>
+                </div>
                 <input
                   type="file"
                   accept="image/png,image/jpeg,image/webp"
-                  className="block w-full text-sm file:mr-3 file:cursor-pointer file:rounded-md file:border file:border-black file:bg-yellow-400 file:px-3 file:py-1.5 file:text-sm file:font-semibold file:text-black"
+                  className="block w-full text-sm file:mr-3 file:cursor-pointer file:rounded-md file:border file:border-black file:bg-yellow-400 file:px-3 file:py-1.5 file:text-sm file:font-semibold file:text-black file:transition file:hover:shadow-md file:hover:bg-yellow-300"
                   style={{ color: "var(--ts-text-muted)" }}
                   onChange={(e) => setLogoFile(e.target.files?.[0] ?? null)}
                 />
+                {logoFile && (
+                  <p className="text-xs" style={{ color: "var(--ts-text-muted)" }}>
+                    <span>✓ Uploaded: {logoFile.name}</span>
+                  </p>
+                )}
               </div>
 
               {/* Custom dims toggle */}
-              <label className="flex cursor-pointer items-center gap-2.5 text-sm" style={{ color: "var(--ts-text)" }}>
+              <label className="flex cursor-pointer items-center gap-2.5 text-sm group transition hover:opacity-80" style={{ color: "var(--ts-text)" }}>
                 <input
                   type="checkbox"
                   checked={useCustomDims}
                   onChange={(e) => setUseCustomDims(e.target.checked)}
-                  className="size-4 rounded"
+                  className="size-4 rounded cursor-pointer"
                   style={{ accentColor: "var(--ts-yellow)" }}
                 />
                 Custom dimensions (mm)
+                <span className="text-xs opacity-0 group-hover:opacity-100 transition" style={{ color: "var(--ts-text-muted)" }} title="Override default dimensions with custom measurements">ℹ️</span>
               </label>
 
               {useCustomDims && (
@@ -359,17 +386,17 @@ export function TessellateApp() {
                 </div>
               )}
 
-              <div className="space-y-1.5">
-                <span className="text-sm font-medium" style={{ color: "var(--ts-text)" }}>
-                  360° Panorama background{" "}
-                  <span className="font-normal text-xs" style={{ color: "var(--ts-text-muted)" }}>
-                    (equirectangular recommended)
+              <div className="space-y-1.5 group">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-medium" style={{ color: "var(--ts-text)" }}>
+                    360° Panorama background
                   </span>
-                </span>
+                  <span className="text-xs opacity-0 group-hover:opacity-100 transition" style={{ color: "var(--ts-text-muted)" }} title="Create a full-environment effect for your 3D model">ℹ️</span>
+                </div>
                 <input
                   type="file"
                   accept="image/png,image/jpeg,image/webp"
-                  className="block w-full text-sm"
+                  className="block w-full text-sm file:mr-3 file:cursor-pointer file:rounded-md file:border file:border-black file:bg-white file:px-3 file:py-1.5 file:text-sm file:font-semibold file:text-black file:transition file:hover:shadow-md file:hover:bg-gray-50"
                   style={{ color: "var(--ts-text-muted)" }}
                   onChange={async (e) => {
                     try { await handleBgUpload(e.target.files?.[0] ?? null); }
@@ -396,24 +423,38 @@ export function TessellateApp() {
               </div>
 
               {/* Action buttons */}
-              <div className="flex flex-wrap gap-3 pt-1">
+              <div className="flex flex-wrap gap-3 pt-3">
                 <button
                   type="button"
                   disabled={busy !== null}
                   onClick={() => void handleGenerateDieline()}
-                  className="rounded-md border border-black px-5 py-2.5 text-sm font-semibold text-black transition disabled:opacity-50"
+                  className="rounded-md border border-black px-5 py-2.5 text-sm font-semibold text-black transition disabled:opacity-50 hover:shadow-md hover:scale-105 active:scale-95"
                   style={{ background: "var(--ts-yellow)" }}
                 >
-                  {busy === "dieline" ? "Generating…" : "Generate dieline"}
+                  {busy === "dieline" ? (
+                    <span className="inline-flex items-center gap-2">
+                      <span className="inline-block h-3 w-3 rounded-full border-2 border-black border-r-transparent animate-spin" />
+                      Generating…
+                    </span>
+                  ) : (
+                    "Generate dieline"
+                  )}
                 </button>
                 <button
                   type="button"
                   disabled={busy !== null || !dielineBase64}
                   onClick={() => void handleConvert()}
-                  className="rounded-md px-5 py-2.5 text-sm font-semibold transition disabled:opacity-50"
+                  className="rounded-md px-5 py-2.5 text-sm font-semibold transition disabled:opacity-50 hover:shadow-md hover:scale-105 active:scale-95"
                   style={{ background: "var(--ts-surface-alt)", border: "1px solid var(--ts-border)", color: "var(--ts-text)" }}
                 >
-                  {busy === "convert" ? "Building 3D…" : "Convert to 3D"}
+                  {busy === "convert" ? (
+                    <span className="inline-flex items-center gap-2">
+                      <span className="inline-block h-3 w-3 rounded-full border-2 border-black border-r-transparent animate-spin" />
+                      Building 3D…
+                    </span>
+                  ) : (
+                    "Convert to 3D"
+                  )}
                 </button>
               </div>
 
@@ -493,30 +534,39 @@ export function TessellateApp() {
                   className="mb-4 text-base font-semibold uppercase tracking-wider"
                   style={{ color: "var(--ts-black)" }}
                 >
-                  Export
+                  Export Assets
                 </h2>
-                <div className="flex flex-wrap gap-3">
+                {!gltfBase64 && (
+                  <p className="text-xs mb-4 p-3 rounded-md" style={{ color: "var(--ts-text-muted)", background: "rgba(255, 212, 0, 0.1)" }}>
+                    💡 Convert your design to 3D to enable downloads
+                  </p>
+                )}
+                <div className="grid gap-3 sm:grid-cols-3">
                   <button
                     type="button"
                     disabled={!gltfBase64}
                     onClick={() => gltfBase64 && downloadBase64(gltfBase64, "tessellate-mockup.glb", "model/gltf-binary")}
-                    className="rounded-md px-4 py-2 text-sm font-semibold text-white transition disabled:opacity-40"
+                    className="rounded-md px-4 py-3 text-sm font-semibold text-white transition disabled:opacity-40 hover:shadow-lg hover:scale-105 active:scale-95"
                     style={{ background: "var(--ts-black)" }}
+                    title="Download 3D model for Blender or other 3D software"
                   >
-                    Download .glb
+                    <span className="block">Download</span>
+                    <span className="block text-xs font-normal opacity-80">.glb (3D model)</span>
                   </button>
                   <button
                     type="button"
                     disabled={!previewBase64}
                     onClick={() => previewBase64 && downloadBase64(previewBase64, "tessellate-preview.png", "image/png")}
-                    className="rounded-md px-4 py-2 text-sm font-semibold transition disabled:opacity-40"
+                    className="rounded-md px-4 py-3 text-sm font-semibold transition disabled:opacity-40 hover:shadow-lg hover:scale-105 active:scale-95"
                     style={{ border: "1px solid var(--ts-border)", background: "var(--ts-surface-alt)", color: "var(--ts-text)" }}
+                    title="Download a high-resolution preview image"
                   >
-                    Download .png
+                    <span className="block">Download</span>
+                    <span className="block text-xs font-normal opacity-80">.png (image)</span>
                   </button>
                   <a
                     href={downloadUrl ? `${downloadUrl}?format=json` : undefined}
-                    className="inline-flex items-center rounded-md px-4 py-2 text-sm font-semibold transition"
+                    className="inline-flex flex-col items-center justify-center rounded-md px-4 py-3 text-sm font-semibold transition"
                     style={{
                       border: "1px solid var(--ts-border)",
                       background: "var(--ts-surface-alt)",
@@ -524,8 +574,10 @@ export function TessellateApp() {
                       opacity: downloadUrl ? 1 : 0.4,
                       pointerEvents: downloadUrl ? "auto" : "none",
                     }}
+                    title="Download metadata and configuration"
                   >
-                    Metadata .json
+                    <span className="block">Download</span>
+                    <span className="block text-xs font-normal opacity-80">.json (metadata)</span>
                   </a>
                 </div>
               </div>
@@ -539,7 +591,7 @@ export function TessellateApp() {
         className="py-5 text-center text-xs"
         style={{ background: "var(--ts-black)", color: "var(--ts-white)" }}
       >
-        tessellate — 2D to 3D Packaging Studio &nbsp;·&nbsp; Powered by Gemini Nano Banana 🍌
+        tessellate - 2D to 3D Packaging Studio &nbsp;·&nbsp; Powered by Claude
       </footer>
     </div>
   );

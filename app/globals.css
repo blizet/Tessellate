@@ -43,3 +43,93 @@ body {
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: var(--ts-white); }
 ::-webkit-scrollbar-thumb { background: var(--ts-black); border-radius: 3px; }
+
+/* Smooth page transitions */
+@supports (view-transition-name: auto) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: 0.3s;
+  }
+}
+
+/* Improved button animations */
+button {
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+button:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+button:active:not(:disabled) {
+  transform: translateY(0px);
+}
+
+/* Input field improvements */
+input[type="text"],
+input[type="email"],
+input[type="number"],
+textarea,
+select {
+  transition: all 0.2s ease;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  box-shadow: 0 0 0 3px rgba(255, 212, 0, 0.2), 0 0 0 1px rgba(0, 0, 0, 0.1);
+}
+
+/* Smooth animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideInFromLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes pulse-subtle {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+section {
+  animation: fadeInUp 0.5s ease-out;
+}
+
+/* Improved label styling with smooth transitions */
+label {
+  transition: all 0.2s ease;
+}
+
+label:hover {
+  color: rgba(0, 0, 0, 0.8);
+}

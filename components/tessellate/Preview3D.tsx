@@ -1,8 +1,8 @@
 "use client";
 
-import { Canvas, useLoader, useThree } from "@react-three/fiber";
-import { Environment, OrbitControls } from "@react-three/drei";
-import { Suspense, useEffect, useMemo } from "react";
+import { Canvas, useLoader, useThree, useFrame } from "@react-three/fiber";
+import { Environment, OrbitControls, BakeShadows } from "@react-three/drei";
+import { Suspense, useEffect, useMemo, useRef } from "react";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import * as THREE from "three";
 
@@ -29,7 +29,7 @@ function EquiEnv({ url }: { url: string }) {
   return null;
 }
 
-// ─── Auto-framing box model ───────────────────────────────────────────────────
+// ─── Auto-framing box model with refined materials ───────────────────────────
 
 function Model({ url }: { url: string }) {
   const gltf = useLoader(GLTFLoader, url);
@@ -45,6 +45,20 @@ function Model({ url }: { url: string }) {
 
     s.position.sub(centre);
 
+    // Improve material appearance for refined 3D look
+    s.traverse((node) => {
+      if (node instanceof THREE.Mesh && node.material) {
+        const mat = node.material as THREE.MeshStandardMaterial;
+        if (mat.map) {
+          mat.map.colorSpace = THREE.SRGBColorSpace;
+          mat.map.magFilter = THREE.LinearFilter;
+          mat.map.minFilter = THREE.LinearMipmapLinearFilter;
+        }
+        mat.envMapIntensity = 1.0;
+        mat.flatShading = false;
+      }
+    });
+
     const fov  = (camera as THREE.PerspectiveCamera).fov * (Math.PI / 180);
     // Multiplier 1.43 ≈ 1/0.70 → box fills ~70% of the viewport
     const dist = (maxDim / 2) / Math.tan(fov / 2) * 1.43;
@@ -58,10 +72,25 @@ function Model({ url }: { url: string }) {
 }
 
 function LoadingSpinner() {
+  const meshRef = useRef<THREE.Mesh>(null);
+  
+  useFrame(() => {
+    if (meshRef.current) {
+      meshRef.current.rotation.x += 0.015;
+      meshRef.current.rotation.y += 0.015;
+    }
+  });
+
   return (
-    <mesh rotation={[0.4, 0.4, 0]}>
+    <mesh ref={meshRef} rotation={[0.4, 0.4, 0]}>
       <boxGeometry args={[0.6, 0.6, 0.6]} />
-      <meshStandardMaterial color="#ffd400" />
+      <meshStandardMaterial 
+        color="#ffd400"
+        metalness={0.3}
+        roughness={0.4}
+        emissive="#ffd400"
+        emissiveIntensity={0.3}
+      />
     </mesh>
   );
 }
@@ -118,7 +147,11 @@ export function Preview3D({
   return (
     <div
       className="h-[420px] w-full overflow-hidden rounded-xl"
-      style={{ border: "1px solid var(--ts-border)", background: "var(--ts-white)" }}
+      style={{ 
+        border: "1px solid var(--ts-border)", 
+        background: "var(--ts-white)",
+        boxShadow: "0 4px 16px rgba(0, 0, 0, 0.08)"
+      }}
     >
       <Canvas
         shadows
@@ -129,12 +162,38 @@ export function Preview3D({
           toneMappingExposure: 1.1,
         }}
       >
-        {/* Background: panorama if supplied, otherwise solid colour + preset env */}
-        {!bgUrl && <color attach="background" args={["#ffffff"]} />}
+        {/* Background: panorama if supplied, otherwise gradient + preset env */}
+        {!bgUrl && (
+          <>
+            <color attach="background" args={["#fafafa"]} />
+            <mesh position={[0, -8, -2]} scale={[40, 1, 40]}>
+              <planeGeometry />
+              <meshStandardMaterial 
+                color="#f0f0f0"
+                roughness={0.9}
+                metalness={0}
+              />
+            </mesh>
+          </>
+        )}
 
-        <ambientLight intensity={bgUrl ? 0.4 : 0.7} />
-        <directionalLight castShadow position={[5, 8, 6]} intensity={bgUrl ? 1.0 : 1.6} />
-        <directionalLight position={[-4, 3, -4]} intensity={0.3} />
+        {/* Enhanced lighting setup for refined appearance */}
+        <ambientLight intensity={bgUrl ? 0.5 : 0.85} />
+        <directionalLight 
+          castShadow 
+          position={[5, 8, 6]} 
+          intensity={bgUrl ? 1.0 : 1.8}
+          shadow-mapSize-width={2048}
+          shadow-mapSize-height={2048}
+          shadow-camera-left={-10}
+          shadow-camera-right={10}
+          shadow-camera-top={10}
+          shadow-camera-bottom={-10}
+        />
+        <directionalLight position={[-4, 3, -4]} intensity={0.4} />
+        
+        {/* Rim light for better depth perception */}
+        <directionalLight position={[-8, 2, -8]} intensity={0.3} color="#e8e8ff" />
 
         <Suspense key={url} fallback={<LoadingSpinner />}>
           {/* Equirectangular panorama overrides both background and env lighting */}
@@ -143,13 +202,14 @@ export function Preview3D({
           <Model url={url} />
 
           {/* Fallback preset env light when no panorama */}
-          {!bgUrl && <Environment preset="studio" />}
+          {!bgUrl && <Environment preset="studio" blur={0.7} />}
         </Suspense>
 
         <OrbitControls
           makeDefault
           enableDamping
-          dampingFactor={0.07}
+          dampingFactor={0.08}
+          autoRotate={false}
           minDistance={0.4}
           maxDistance={12}
         />

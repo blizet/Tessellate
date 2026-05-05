@@ -102,23 +102,24 @@ const BOX_META: Record<string, BoxMeta> = {
     flapNotes:
       "Seam tab on the right glues to the left edge. A vertical dashed line separates FRONT ZONE from BACK ZONE at roughly the 66% mark.",
     dimensionAxes: "H = label height, W = circumference (width of the strip), L = not applicable",
-    aspectHint: "roughly 3:1 width-to-height for the label strip",
+    aspectHint: "TALL VERTICAL orientation — roughly 1:2.8 width-to-height for the label strip (much taller than wide, like a bottle label)",
   },
   cake_box: {
-    netShape: "plus / cross shape (four sides fold out from a square base)",
+    netShape: "cross / plus shape with rounded corners — premium bakery box with domed lid",
     panelList: [
-      "BASE PANEL (large square at center)",
-      "FRONT SIDE PANEL (folds down from base bottom edge)",
-      "BACK SIDE PANEL (folds up from base top edge)",
-      "LEFT SIDE PANEL (folds left from base left edge, text rotated 90°)",
-      "RIGHT SIDE PANEL (folds right from base right edge, text rotated 90°)",
-      "CORNER TUCK TABS (small triangular tabs at corners of side panels, 8 total)",
+      "BASE PANEL (square at center with rounded corners)",
+      "FRONT SIDE PANEL (folds up from base bottom edge, with rounded top edge)",
+      "BACK SIDE PANEL (folds up from base top edge, with rounded top edge)",
+      "LEFT SIDE PANEL (folds up from base left edge, rounded top, text rotated 90°)",
+      "RIGHT SIDE PANEL (folds up from base right edge, rounded top, text rotated 90°)",
+      "ROUNDED CORNER FLAPS (curved flaps at corners where side panels meet, 4 total)",
+      "LID SECTION (optional domed/curved lid top that curves upward)",
     ],
-    frontPanel: "FRONT SIDE PANEL",
-    sidePanel: "LEFT SIDE PANEL and RIGHT SIDE PANEL",
-    topBottomPanels: "BACK SIDE PANEL (opposite the front) — note: no lid in this net",
+    frontPanel: "FRONT SIDE PANEL (primary display area with circular logo placement)",
+    sidePanel: "LEFT SIDE PANEL and RIGHT SIDE PANEL (secondary branding, curved design)",
+    topBottomPanels: "BACK SIDE PANEL (back face design) and curved corner elements",
     flapNotes:
-      "Eight triangular corner tuck tabs interlock to hold the box shape. Score/perforation lines on the tabs.",
+      "Curved corner flaps create elegant rounded transitions. All edges feature smooth curves rather than sharp corners for premium bakery appearance. Fold lines should be clean and precise.",
     dimensionAxes: "L = length of base, W = width of base, H = height of side panels",
     aspectHint: "roughly 1:1 (square) for the overall net",
   },
@@ -161,11 +162,11 @@ const TEMPLATE_REFERENCES: Record<BoxType, string> = {
   horizontal_box:
     "Use the horizontal box dieline reference: a squat landscape carton with a large central rectangle, wide top flap with rounded corners and a small thumb notch, side flaps on left and right, bottom flap, dashed fold lines, and W/H/L dimension arrows around the central panel.",
   bottle:
-    "Use the bottle packaging box reference: a long rectangular wrap body divided by many vertical dashed fold lines, narrow top and bottom tabs, side glue flaps, and circular bottle-neck or viewing holes on the small end panels.",
+    "Use the bottle packaging reference: a TALL VERTICAL rectangular label strip (portrait orientation, much taller than it is wide) that wraps around a cylindrical bottle. The label should be divided by a vertical dashed line separating FRONT LABEL ZONE from BACK LABEL ZONE. A narrow seam tab is on the right edge. The overall strip is DISTINCTLY TALL and ELONGATED VERTICALLY, not horizontal.",
   trapezoid:
     "Use the trapezoid dieline reference: a tapered central body with trapezoid panels, curved side lobes, angled crease lines radiating from the central rectangles, a top flap with perforation waves, and a scalloped lower edge.",
   cake_box:
-    "Use the cake box dieline reference: a four-petal auto-lock cake box net with a square center, rounded top and bottom locking tabs, pointed left and right side flaps with slots, small logo ovals on side panels, and red fold lines inside a clean black outline.",
+    "Use the cake box dieline reference: a premium bakery-style cake box net with a square base center, rounded domed top lid section, and four side panels folding upward. Features include: curved/rounded edges throughout, a prominent circular logo placement on the front face, smooth curved corners (no sharp angles), and clean fold lines. The overall silhouette is elegant and bakery-appropriate with a professional finish.",
 };
 
 // ─── Cross-net UV grid (must match buildGlb UV constants) ────────────────────
@@ -234,6 +235,27 @@ SIDE PANELS (col 0 and col 2, row 1): ${meta.sidePanel}
 TOP / BOTTOM (col 1, rows 0 and 2): ${meta.topBottomPanels}
 FLAP NOTES: ${meta.flapNotes}
 DIMENSION AXES: ${meta.dimensionAxes}
+
+${params.boxType === "bottle" ? `
+CRITICAL BOTTLE-SPECIFIC INSTRUCTION:
+The bottle label MUST be rendered TALL and VERTICALLY ELONGATED, matching a 200mm height with only ~70mm circumference.
+Design the label strip to be MUCH TALLER than it is WIDE within the grid constraint.
+The FRONT LABEL ZONE (center cell) and BACK LABEL ZONE must display prominently in the center column with substantial vertical extent.
+Avoid horizontal or landscape orientation — this is a portrait-oriented bottle label.
+` : ""}
+
+${params.boxType === "cake_box" ? `
+CRITICAL CAKE BOX-SPECIFIC INSTRUCTION:
+Design a PREMIUM BAKERY-STYLE cake box with these characteristics:
+- All edges should feature SMOOTH CURVES and ROUNDED CORNERS (no sharp angles)
+- The front panel should have a prominent CIRCULAR LOGO PLACEMENT at the center
+- The domed/curved lid appearance should be evident in the design aesthetic
+- Four side panels that fold up from the base, each with curved tops
+- Clean, elegant fold lines throughout
+- The overall impression should be sophisticated bakery packaging, not a plain box
+- Include curved decorative corner elements where side panels would meet
+- Color palette should be sophisticated (consider soft pastels or elegant whites/creams)
+` : ""}
 
 ━━━ LINE TYPES (draw ALL four types, include a legend at the bottom) ━━━
 
@@ -438,6 +460,108 @@ async function compositeLogo(dieline: Buffer, logo: Buffer): Promise<Buffer> {
 }
 
 /**
+ * Generates a tall vertical bottle label fallback dieline.
+ * The bottle label is much TALLER than it is WIDE within the 1024×768 grid.
+ * 
+ * Layout: Center column (col 1-2) is divided into FRONT and BACK label zones
+ * stacked vertically, with a narrow seam tab on the right (col 3).
+ */
+async function buildFallbackBottleLabel(params: {
+  businessName: string;
+  tagline?: string;
+  printDescription: string;
+  boxType: BoxType;
+}): Promise<Buffer> {
+  const W = 1024;
+  const H = 768;
+  
+  const name  = escapeXml(params.businessName);
+  const init  = escapeXml((params.businessName.charAt(0) || "?").toUpperCase());
+  const desc  = escapeXml((params.tagline?.trim() || params.printDescription).slice(0, 60));
+
+  const svg = `<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}"
+     viewBox="0 0 ${W} ${H}" font-family="system-ui,Arial,sans-serif">
+  <defs>
+    <pattern id="hatch-bottle" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <line x1="0" y1="0" x2="0" y2="6" stroke="#000000" stroke-width="2"/>
+    </pattern>
+  </defs>
+
+  <!-- BACKGROUND -->
+  <rect width="${W}" height="${H}" fill="#ffffff"/>
+
+  <!-- BOTTLE LABEL STRIP — TALL VERTICAL ORIENTATION -->
+  <!-- The wraparound label spans from col 1-2 (center), rows 0-3 (full height) -->
+  <!-- Left and right are background, center is the label -->
+  
+  <!-- FRONT LABEL ZONE (upper two-thirds of center) -->
+  <rect x="256" y="20" width="512" height="400" fill="#ffffff" stroke="#000000" stroke-width="2.2"/>
+  <rect x="256" y="20" width="512" height="12" fill="#ffd400"/>
+  
+  <!-- Branding elements in FRONT zone -->
+  <circle cx="512" cy="100" r="50" fill="#ffd400" opacity="0.35"/>
+  <circle cx="512" cy="100" r="32" fill="#ffd400" opacity="0.65"/>
+  <circle cx="512" cy="100" r="20" fill="#000000"/>
+  <text x="512" y="108" text-anchor="middle" font-size="24" font-weight="700" fill="#ffffff">${init}</text>
+  
+  <text x="512" y="190" text-anchor="middle" font-size="24" font-weight="700" fill="#000000">${name}</text>
+  <text x="512" y="220" text-anchor="middle" font-size="11" fill="#000000">${desc}</text>
+  <text x="512" y="380" text-anchor="middle" font-size="10" font-weight="600" fill="#666666">FRONT LABEL ZONE</text>
+
+  <!-- CENTER DIVIDING LINE (separates FRONT from BACK) -->
+  <line x1="256" y1="420" x2="768" y2="420" stroke="#000000" stroke-width="1.5" stroke-dasharray="8 6"/>
+
+  <!-- BACK LABEL ZONE (lower third of center) -->
+  <rect x="256" y="420" width="512" height="320" fill="#ffffff" stroke="#000000" stroke-width="2.2"/>
+  <text x="512" y="480" text-anchor="middle" font-size="14" font-weight="600" fill="#666666">BACK LABEL ZONE</text>
+  <text x="512" y="510" text-anchor="middle" font-size="10" fill="#999999">(secondary info / ingredients)</text>
+  <text x="512" y="530" text-anchor="middle" font-size="9" fill="#999999">✧ ✧ ✧</text>
+
+  <!-- SEAM / OVERLAP TAB (right edge, narrow strip) -->
+  <rect x="768" y="20" width="40" height="720" fill="url(#hatch-bottle)" opacity="0.7" stroke="#000000" stroke-width="1.5"/>
+  <text x="788" y="384" text-anchor="middle" font-size="8" fill="#000000" transform="rotate(-90 788 384)">SEAM TAB</text>
+
+  <!-- DIMENSION ANNOTATIONS -->
+  <!-- HEIGHT arrow on left -->
+  <g stroke="#000000" stroke-width="1.2" fill="#000000">
+    <line x1="40" y1="20" x2="40" y2="740"/>
+    <polygon points="40,20 34,36 46,36"/>
+    <polygon points="40,740 34,724 46,724"/>
+    <text x="20" y="390" text-anchor="end" font-size="10" font-weight="600">H</text>
+  </g>
+  
+  <!-- WIDTH arrow at top -->
+  <g stroke="#000000" stroke-width="1.2" fill="#000000">
+    <line x1="256" y1="10" x2="768" y2="10"/>
+    <polygon points="256,10 272,4 272,16"/>
+    <polygon points="768,10 752,4 752,16"/>
+  </g>
+
+  <!-- LEGEND — bottom strip -->
+  <rect x="0" y="${H - 22}" width="${W}" height="22" fill="#000000"/>
+  <g fill="#ffffff" font-size="9">
+    <line x1="10" y1="${H - 11}" x2="38" y2="${H - 11}" stroke="#ffffff" stroke-width="2"/>
+    <text x="42" y="${H - 6}">Full Cut</text>
+    
+    <line x1="140" y1="${H - 11}" x2="168" y2="${H - 11}" stroke="#ffffff" stroke-width="1.5" stroke-dasharray="8 5"/>
+    <text x="172" y="${H - 6}">Crease</text>
+    
+    <rect x="296" y="${H - 17}" width="18" height="10" fill="url(#hatch-bottle)"/>
+    <text x="318" y="${H - 6}">Seam Tab</text>
+    
+    <text x="${W / 2}" y="${H - 6}" text-anchor="middle" font-size="9">BOTTLE LABEL — Tall Vertical Orientation (200mm H × 70mm circumference)</text>
+    <text x="${W - 8}" y="${H - 6}" text-anchor="end" font-size="8">Placeholder</text>
+  </g>
+</svg>`;
+
+  return sharp(Buffer.from(svg))
+    .resize(W, H, { fit: "fill" })
+    .png()
+    .toBuffer();
+}
+
+/**
  * Generates a placeholder dieline PNG whose panel positions EXACTLY match the
  * UV grid consumed by buildGlb.ts.
  *
@@ -447,6 +571,8 @@ async function compositeLogo(dieline: Buffer, logo: Buffer): Promise<Buffer> {
  *  row 0 (y=0..256):    [ bg/arrows ]         [  TOP + TUCK FLAP ] [ bg ]  [ bg ]
  *  row 1 (y=256..512):  [ LEFT+GLUE ]         [ FRONT (hero)     ] [RIGHT] [BACK]
  *  row 2 (y=512..768):  [ bg/arrows ]         [BOTTOM + DUST FLAP] [ bg ]  [ bg ]
+ *
+ * Special case: bottle type gets a TALL VERTICAL label layout instead
  */
 async function buildFallbackDielinePng(params: {
   businessName: string;
@@ -455,6 +581,12 @@ async function buildFallbackDielinePng(params: {
   boxType: BoxType;
 }): Promise<Buffer> {
   const meta = BOX_META[params.boxType];
+  
+  // Special handling for bottle labels - create a tall vertical layout
+  if (params.boxType === "bottle") {
+    return buildFallbackBottleLabel(params);
+  }
+  
   const W = 1024;
   const H = 768;
   const C = 256;   // cell size

@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "tessellate — 2D to 3D packaging mockups",
+  title: "tessellate - 2D to 3D packaging mockups",
   description:
     "Generate packaging dielines and convert them to Blender-ready 3D mockups.",
 };
