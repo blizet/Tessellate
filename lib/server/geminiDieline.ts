@@ -276,9 +276,10 @@ Overall net aspect ratio hint: ${meta.aspectHint}
 
 ━━━ PANEL LABELS ━━━
 
-Print the structural name of every panel INSIDE its region in small-caps sans-serif text, black, centred:
+Print the structural name of every panel INSIDE its region in small-caps sans-serif text, PURE BLACK (#000000), bold font-weight (600+), centred:
 ${meta.panelList.map((p) => `  • ${p.split("(")[0].trim()}`).join("\n")}
 Side panel labels must be rotated 90° to match panel orientation.
+CRITICAL: All text must be in PURE BLACK (#000000) or DARK GRAY (#333333) with no light gray text. Ensure HIGH CONTRAST with white background for full legibility.
 
 ━━━ BRAND ARTWORK (applied ON TOP of the structure) ━━━
 
@@ -304,9 +305,20 @@ The brand artwork should look like a real print-ready design — vibrant, intent
 - High resolution, crisp edges, flat graphic style
 - Overall image should be square or landscape, well-centred, with ~8% margin around the net
 
+━━━ TEXT & FONT VISIBILITY ━━━
+
+CRITICAL: ALL TEXT MUST BE HIGHLY VISIBLE AND LEGIBLE
+- Use PURE BLACK (#000000) for all text and labels (no gray, no light colors)
+- Use BOLD font-weight (600 minimum) for all text
+- Make text size large enough to read easily (minimum 9pt for labels)
+- Ensure maximum contrast: dark text on light background
+- All panel labels, dimension annotations, and branding text must be crisp and clear
+- No light gray or pale colors for any text
+- Text must be immediately readable without zoom or enhancement
+
 ━━━ QUALITY BAR ━━━
 
-This image must look indistinguishable from a professional packaging dieline file exported from Adobe Illustrator or ArtiosCAD — the kind a print shop or packaging manufacturer would accept for production. Every fold line, every panel label, every dimension arrow must be present and legible.
+This image must look indistinguishable from a professional packaging dieline file exported from Adobe Illustrator or ArtiosCAD — the kind a print shop or packaging manufacturer would accept for production. Every fold line, every panel label, every dimension arrow must be present and LEGIBLE WITH PERFECT FONT VISIBILITY.
 `.trim();
 }
 
@@ -481,7 +493,7 @@ async function buildFallbackBottleLabel(params: {
 
   const svg = `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}"
-     viewBox="0 0 ${W} ${H}" font-family="system-ui,Arial,sans-serif">
+     viewBox="0 0 ${W} ${H}" font-family="Arial, Helvetica, sans-serif">
   <defs>
     <pattern id="hatch-bottle" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
       <line x1="0" y1="0" x2="0" y2="6" stroke="#000000" stroke-width="2"/>
@@ -503,28 +515,28 @@ async function buildFallbackBottleLabel(params: {
   <circle cx="512" cy="100" r="50" fill="#ffd400" opacity="0.35"/>
   <circle cx="512" cy="100" r="32" fill="#ffd400" opacity="0.65"/>
   <circle cx="512" cy="100" r="20" fill="#000000"/>
-  <text x="512" y="108" text-anchor="middle" font-size="24" font-weight="700" fill="#ffffff">${init}</text>
+  <text x="512" y="108" text-anchor="middle" font-size="24" font-weight="700" fill="#ffffff" font-family="Arial, sans-serif">${init}</text>
   
-  <text x="512" y="190" text-anchor="middle" font-size="24" font-weight="700" fill="#000000">${name}</text>
-  <text x="512" y="220" text-anchor="middle" font-size="11" fill="#000000">${desc}</text>
-  <text x="512" y="380" text-anchor="middle" font-size="10" font-weight="600" fill="#666666">FRONT LABEL ZONE</text>
+  <text x="512" y="190" text-anchor="middle" font-size="24" font-weight="700" fill="#000000" font-family="Arial, sans-serif">${name}</text>
+  <text x="512" y="220" text-anchor="middle" font-size="11" fill="#000000" font-family="Arial, sans-serif">${desc}</text>
+  <text x="512" y="380" text-anchor="middle" font-size="10" font-weight="600" fill="#000000" font-family="Arial, sans-serif">FRONT LABEL ZONE</text>
 
   <!-- CENTER DIVIDING LINE (separates FRONT from BACK) -->
   <line x1="256" y1="420" x2="768" y2="420" stroke="#000000" stroke-width="1.5" stroke-dasharray="8 6"/>
 
   <!-- BACK LABEL ZONE (lower third of center) -->
   <rect x="256" y="420" width="512" height="320" fill="#ffffff" stroke="#000000" stroke-width="2.2"/>
-  <text x="512" y="480" text-anchor="middle" font-size="14" font-weight="600" fill="#666666">BACK LABEL ZONE</text>
-  <text x="512" y="510" text-anchor="middle" font-size="10" fill="#999999">(secondary info / ingredients)</text>
-  <text x="512" y="530" text-anchor="middle" font-size="9" fill="#999999">✧ ✧ ✧</text>
+  <text x="512" y="480" text-anchor="middle" font-size="14" font-weight="600" fill="#000000" font-family="Arial, sans-serif">BACK LABEL ZONE</text>
+  <text x="512" y="510" text-anchor="middle" font-size="10" fill="#000000" font-family="Arial, sans-serif">(secondary info / ingredients)</text>
+  <text x="512" y="530" text-anchor="middle" font-size="9" fill="#333333" font-family="Arial, sans-serif">✧ ✧ ✧</text>
 
   <!-- SEAM / OVERLAP TAB (right edge, narrow strip) -->
   <rect x="768" y="20" width="40" height="720" fill="url(#hatch-bottle)" opacity="0.7" stroke="#000000" stroke-width="1.5"/>
-  <text x="788" y="384" text-anchor="middle" font-size="8" fill="#000000" transform="rotate(-90 788 384)">SEAM TAB</text>
+  <text x="788" y="384" text-anchor="middle" font-size="8" fill="#000000" font-family="Arial, sans-serif" transform="rotate(-90 788 384)">SEAM TAB</text>
 
   <!-- DIMENSION ANNOTATIONS -->
   <!-- HEIGHT arrow on left -->
-  <g stroke="#000000" stroke-width="1.2" fill="#000000">
+  <g stroke="#000000" stroke-width="1.2" fill="#000000" font-family="Arial, sans-serif">
     <line x1="40" y1="20" x2="40" y2="740"/>
     <polygon points="40,20 34,36 46,36"/>
     <polygon points="40,740 34,724 46,724"/>
@@ -532,7 +544,7 @@ async function buildFallbackBottleLabel(params: {
   </g>
   
   <!-- WIDTH arrow at top -->
-  <g stroke="#000000" stroke-width="1.2" fill="#000000">
+  <g stroke="#000000" stroke-width="1.2" fill="#000000" font-family="Arial, sans-serif">
     <line x1="256" y1="10" x2="768" y2="10"/>
     <polygon points="256,10 272,4 272,16"/>
     <polygon points="768,10 752,4 752,16"/>
@@ -540,7 +552,7 @@ async function buildFallbackBottleLabel(params: {
 
   <!-- LEGEND — bottom strip -->
   <rect x="0" y="${H - 22}" width="${W}" height="22" fill="#000000"/>
-  <g fill="#ffffff" font-size="9">
+  <g fill="#ffffff" font-size="9" font-family="Arial, sans-serif">
     <line x1="10" y1="${H - 11}" x2="38" y2="${H - 11}" stroke="#ffffff" stroke-width="2"/>
     <text x="42" y="${H - 6}">Full Cut</text>
     
@@ -613,7 +625,7 @@ async function buildFallbackDielinePng(params: {
 
   const svg = `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}"
-     viewBox="0 0 ${W} ${H}" font-family="system-ui,Arial,sans-serif">
+     viewBox="0 0 ${W} ${H}" font-family="Arial, Helvetica, sans-serif">
   <defs>
     <!-- hatch for glue area -->
     <pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
@@ -643,10 +655,10 @@ async function buildFallbackDielinePng(params: {
         stroke="#000000" stroke-width="1.5" stroke-dasharray="10 6"/>
   <!-- TOP PANEL label -->
   <text x="${fcx}" y="${y0 + TUCK_H + (C - TUCK_H) / 2 + 5}"
-        text-anchor="middle" font-size="12" font-weight="600" fill="#000000"
+        text-anchor="middle" font-size="12" font-weight="600" fill="#000000" font-family="Arial, sans-serif"
         letter-spacing="1">TOP PANEL</text>
   <text x="${fcx}" y="${y0 + TUCK_H / 2 + 5}"
-        text-anchor="middle" font-size="9" fill="#000000">TUCK FLAP</text>
+        text-anchor="middle" font-size="9" fill="#000000" font-family="Arial, sans-serif">TUCK FLAP</text>
 
   <!-- ──────────────────────────────────────────────────────
        LEFT CELL (col 0, row 1) — left side + glue tab
@@ -658,11 +670,11 @@ async function buildFallbackDielinePng(params: {
   <rect x="${x0}" y="${y1 + 10}" width="${GLUE_W}" height="${C - 20}"
         fill="none" stroke="#000000" stroke-width="1"/>
   <!-- "GLUE" label vertical -->
-  <text x="${x0 + 9}" y="${y1 + C / 2}" text-anchor="middle" font-size="7" fill="#000000"
+  <text x="${x0 + 9}" y="${y1 + C / 2}" text-anchor="middle" font-size="7" fill="#000000" font-family="Arial, sans-serif"
         transform="rotate(-90 ${x0 + 9} ${y1 + C / 2})">GLUE AREA</text>
   <!-- LEFT SIDE label rotated -->
   <text x="${x0 + GLUE_W + (C - GLUE_W) / 2}" y="${fcy}"
-        text-anchor="middle" font-size="11" font-weight="600" fill="#000000" letter-spacing="1"
+        text-anchor="middle" font-size="11" font-weight="600" fill="#000000" font-family="Arial, sans-serif" letter-spacing="1"
         transform="rotate(-90 ${x0 + GLUE_W + (C - GLUE_W) / 2} ${fcy})">LEFT SIDE PANEL</text>
 
   <!-- ──────────────────────────────────────────────────────
@@ -679,20 +691,20 @@ async function buildFallbackDielinePng(params: {
   <!-- Initial badge -->
   <circle cx="${fcx}" cy="${fcy - 14}" r="22" fill="#000000"/>
   <text x="${fcx}" y="${fcy - 14 + 8}" text-anchor="middle"
-        font-size="22" font-weight="700" fill="#ffffff">${init}</text>
+        font-size="22" font-weight="700" fill="#ffffff" font-family="Arial, sans-serif">${init}</text>
   <!-- Brand name -->
   <text x="${fcx}" y="${fcy + 36}" text-anchor="middle"
-        font-size="20" font-weight="700" fill="#000000">${name}</text>
+        font-size="20" font-weight="700" fill="#000000" font-family="Arial, sans-serif">${name}</text>
   <!-- Tagline / description -->
   <text x="${fcx}" y="${fcy + 54}" text-anchor="middle"
-        font-size="9.5" fill="#000000">${desc}</text>
+        font-size="9.5" fill="#000000" font-family="Arial, sans-serif">${desc}</text>
 
   <!-- ──────────────────────────────────────────────────────
        RIGHT CELL (col 2, row 1) — right side
        ────────────────────────────────────────────────────── -->
   <rect x="${x2}" y="${y1}" width="${C}" height="${C}" fill="#ffffff"/>
   <text x="${(x2 + x3) / 2}" y="${fcy}" text-anchor="middle"
-        font-size="11" font-weight="600" fill="#000000" letter-spacing="1"
+        font-size="11" font-weight="600" fill="#000000" font-family="Arial, sans-serif" letter-spacing="1"
         transform="rotate(90 ${(x2 + x3) / 2} ${fcy})">RIGHT SIDE PANEL</text>
 
   <!-- ──────────────────────────────────────────────────────
@@ -700,7 +712,7 @@ async function buildFallbackDielinePng(params: {
        ────────────────────────────────────────────────────── -->
   <rect x="${x3}" y="${y1}" width="${C}" height="${C}" fill="#ffffff"/>
   <text x="${(x3 + x4) / 2}" y="${fcy}" text-anchor="middle"
-        font-size="11" font-weight="600" fill="#000000" letter-spacing="1">BACK PANEL</text>
+        font-size="11" font-weight="600" fill="#000000" font-family="Arial, sans-serif" letter-spacing="1">BACK PANEL</text>
 
   <!-- ──────────────────────────────────────────────────────
        BOTTOM CELL (col 1, row 2) — bottom face + dust flap
@@ -715,9 +727,9 @@ async function buildFallbackDielinePng(params: {
         stroke="#000000" stroke-width="1.5" stroke-dasharray="10 6"/>
   <!-- BOTTOM label -->
   <text x="${fcx}" y="${y2 + (C - DUST_H) / 2 + 5}" text-anchor="middle"
-        font-size="12" font-weight="600" fill="#000000" letter-spacing="1">BOTTOM PANEL</text>
+        font-size="12" font-weight="600" fill="#000000" font-family="Arial, sans-serif" letter-spacing="1">BOTTOM PANEL</text>
   <text x="${fcx}" y="${DUST_Y + DUST_H / 2 + 4}" text-anchor="middle"
-        font-size="9" fill="#000000">INNER FRONT / DUST FLAP</text>
+        font-size="9" fill="#000000" font-family="Arial, sans-serif">INNER FRONT / DUST FLAP</text>
 
   <!-- ──────────────────────────────────────────────────────
        CUT LINES — outer perimeter of the cross (solid)
@@ -760,21 +772,21 @@ async function buildFallbackDielinePng(params: {
        DIMENSION ANNOTATIONS (in background cells)
        ────────────────────────────────────────────────────── -->
   <!-- W (box width) — above TOP cell, centre -->
-  <g stroke="#000000" stroke-width="1.2" fill="#000000" font-size="11" font-weight="600">
+  <g stroke="#000000" stroke-width="1.2" fill="#000000" font-size="11" font-weight="600" font-family="Arial, sans-serif">
     <line x1="${x1 + 4}" y1="20" x2="${x2 - 4}" y2="20"/>
     <polygon points="${x1 + 4},20 ${x1 + 14},16 ${x1 + 14},24"/>
     <polygon points="${x2 - 4},20 ${x2 - 14},16 ${x2 - 14},24"/>
     <text x="${fcx}" y="14" text-anchor="middle" font-size="10">W</text>
   </g>
   <!-- H (box height) — right of BACK panel -->
-  <g stroke="#000000" stroke-width="1.2" fill="#000000">
+  <g stroke="#000000" stroke-width="1.2" fill="#000000" font-family="Arial, sans-serif">
     <line x1="1010" y1="${y1 + 4}" x2="1010" y2="${y2 - 4}"/>
     <polygon points="1010,${y1 + 4} 1006,${y1 + 14} 1014,${y1 + 14}"/>
     <polygon points="1010,${y2 - 4} 1006,${y2 - 14} 1014,${y2 - 14}"/>
     <text x="1018" y="${fcy + 4}" text-anchor="start" font-size="10">H</text>
   </g>
   <!-- D (depth) — above LEFT panel -->
-  <g stroke="#000000" stroke-width="1.2" fill="#000000">
+  <g stroke="#000000" stroke-width="1.2" fill="#000000" font-family="Arial, sans-serif">
     <line x1="${x0 + 4}" y1="20" x2="${x1 - 4}" y2="20"/>
     <polygon points="${x0 + 4},20 ${x0 + 14},16 ${x0 + 14},24"/>
     <polygon points="${x1 - 4},20 ${x1 - 14},16 ${x1 - 14},24"/>
@@ -785,7 +797,7 @@ async function buildFallbackDielinePng(params: {
        LEGEND — bottom strip
        ────────────────────────────────────────────────────── -->
   <rect x="0" y="${H - 22}" width="${W}" height="22" fill="#000000"/>
-  <g fill="#ffffff" font-size="9">
+  <g fill="#ffffff" font-size="9" font-family="Arial, sans-serif">
     <!-- Cut symbol -->
     <line x1="10" y1="${H - 11}" x2="38" y2="${H - 11}" stroke="#ffffff" stroke-width="2"/>
     <text x="42" y="${H - 6}">Full Cut</text>
