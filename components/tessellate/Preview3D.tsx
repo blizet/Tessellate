@@ -1,7 +1,7 @@
 "use client";
 
 import { Canvas, useLoader, useThree, useFrame } from "@react-three/fiber";
-import { Environment, OrbitControls, BakeShadows } from "@react-three/drei";
+import { Environment, OrbitControls } from "@react-three/drei";
 import { Suspense, useEffect, useMemo, useRef } from "react";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import * as THREE from "three";
@@ -31,7 +31,7 @@ function EquiEnv({ url }: { url: string }) {
 
 // ─── Auto-framing box model with refined materials ───────────────────────────
 
-function Model({ url }: { url: string }) {
+function Model({ url, liveTextureSvg }: { url: string; liveTextureSvg?: string | null }) {
   const gltf = useLoader(GLTFLoader, url);
   const { camera } = useThree();
 
@@ -67,6 +67,42 @@ function Model({ url }: { url: string }) {
 
     return s;
   }, [gltf.scene, camera]);
+
+  useEffect(() => {
+    if (!liveTextureSvg) return;
+
+    const blob = new Blob([liveTextureSvg], { type: "image/svg+xml" });
+    const objectUrl = URL.createObjectURL(blob);
+    let disposed = false;
+
+    const loader = new THREE.TextureLoader();
+    loader.load(
+      objectUrl,
+      (texture) => {
+        if (disposed) return;
+        texture.colorSpace = THREE.SRGBColorSpace;
+        texture.flipY = false;
+        texture.needsUpdate = true;
+
+        scene.traverse((node) => {
+          if (node instanceof THREE.Mesh && node.material) {
+            const mat = node.material as THREE.MeshStandardMaterial;
+            mat.map = texture;
+            mat.needsUpdate = true;
+          }
+        });
+      },
+      undefined,
+      () => {
+        // ignore load errors and keep default texture
+      },
+    );
+
+    return () => {
+      disposed = true;
+      URL.revokeObjectURL(objectUrl);
+    };
+  }, [liveTextureSvg, scene]);
 
   return <primitive object={scene} />;
 }
@@ -114,10 +150,12 @@ export function Preview3D({
   glbBase64,
   bgUrl,
   emptyLabel,
+  liveTextureSvg,
 }: {
   glbBase64: string | null;
   bgUrl: string | null;
   emptyLabel: string;
+  liveTextureSvg?: string | null;
 }) {
   const url = useMemo(
     () => (glbBase64 ? glbBase64ToObjectUrl(glbBase64) : null),
@@ -199,7 +237,7 @@ export function Preview3D({
           {/* Equirectangular panorama overrides both background and env lighting */}
           {bgUrl && <EquiEnv url={bgUrl} />}
 
-          <Model url={url} />
+          <Model url={url} liveTextureSvg={liveTextureSvg} />
 
           {/* Fallback preset env light when no panorama */}
           {!bgUrl && <Environment preset="studio" blur={0.7} />}

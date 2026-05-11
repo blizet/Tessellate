@@ -231,12 +231,13 @@ function panelRect(
 function buildPreciseSvg(
   params: DielineParams,
   spec: DesignSpec,
-  options: { technicalMarks: boolean },
+  options: { technicalMarks: boolean; hasLogo: boolean },
 ): string {
   const [ink, paper, accent, , soft = "#d9ecff"] = spec.palette;
   const labels = PANEL_LABELS[params.boxType];
   const dims = params.dims ?? { width: 80, height: 120, depth: 60 };
   const technicalMarks = options.technicalMarks;
+  const hasLogo = options.hasLogo;
   const name = escapeXml(spec.frontHeadline || params.businessName);
   const subcopy = escapeXml(spec.frontSubcopy || params.tagline || params.printDescription);
   const sideCopy = escapeXml(spec.sideCopy);
@@ -262,8 +263,8 @@ function buildPreciseSvg(
   <rect x="256" y="256" width="256" height="16" fill="${accent}"/>
   <rect x="286" y="286" width="196" height="196" rx="0" fill="${soft}" opacity="0.42"/>
   ${motif(spec, 286, 286, 196, 196)}
-  <circle cx="384" cy="352" r="34" fill="${ink}"/>
-  <text x="384" y="364" text-anchor="middle" font-size="32" font-weight="800" fill="${paper}">${escapeXml(name.charAt(0).toUpperCase())}</text>
+  ${hasLogo ? "" : `<circle cx="384" cy="352" r="34" fill="${ink}"/>`}
+  ${hasLogo ? "" : `<text x="384" y="364" text-anchor="middle" font-size="32" font-weight="800" fill="${paper}">${escapeXml(name.charAt(0).toUpperCase())}</text>`}
   <text x="384" y="414" text-anchor="middle" font-size="22" font-weight="800" fill="${ink}">${name}</text>
   <text x="384" y="437" text-anchor="middle" font-size="11" fill="${ink}">${subcopy}</text>
   <text x="384" y="466" text-anchor="middle" font-size="9" fill="${ink}">${escapeXml(spec.finish)}</text>
@@ -349,14 +350,17 @@ async function compositeLogo(dieline: Buffer, logo: Buffer): Promise<Buffer> {
 export async function generateDielineImage(params: DielineParams): Promise<{
   pngBuffer: Buffer;
   cleanTextureBuffer?: Buffer;
+  svgSource?: string;
+  cleanSvgSource?: string;
   designNotes: string;
   colorPalette: string[];
   source: "claude-svg" | "gemini-image" | "imagen" | "fallback";
 }> {
   try {
     const spec = (await askClaudeForSpec(params)) ?? defaultSpec(params);
-    const svg = buildPreciseSvg(params, spec, { technicalMarks: true });
-    const cleanSvg = buildPreciseSvg(params, spec, { technicalMarks: false });
+    const hasLogo = !!params.logoBuffer?.length;
+    const svg = buildPreciseSvg(params, spec, { technicalMarks: true, hasLogo });
+    const cleanSvg = buildPreciseSvg(params, spec, { technicalMarks: false, hasLogo });
     const png = await sharp(Buffer.from(svg))
       .resize(1024, 768, { fit: "fill" })
       .png()
@@ -371,6 +375,8 @@ export async function generateDielineImage(params: DielineParams): Promise<{
     return {
       pngBuffer: composed,
       cleanTextureBuffer: cleanComposed,
+      svgSource: svg,
+      cleanSvgSource: cleanSvg,
       designNotes: `Claude-guided dieline for "${params.businessName}" using a precise 1024x768 production grid. Artwork follows: ${sanitizeText(params.printDescription, 120)}.`,
       colorPalette: spec.palette,
       source: "claude-svg",

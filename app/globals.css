@@ -121,6 +121,11 @@ select:focus {
   }
 }
 
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
 section {
   animation: fadeInUp 0.5s ease-out;
 }

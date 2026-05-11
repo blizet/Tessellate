@@ -60,6 +60,8 @@ export async function POST(req: Request) {
       dielinePath,
       dielineBase64: out.pngBuffer.toString("base64"),
       cleanTextureBase64: (out.cleanTextureBuffer ?? out.pngBuffer).toString("base64"),
+      svgSource: out.svgSource,
+      cleanSvgSource: out.cleanSvgSource,
       designNotes: out.designNotes,
       colorPalette: out.colorPalette,
       generatedAt: new Date().toISOString(),
